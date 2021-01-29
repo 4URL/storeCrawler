@@ -42,6 +42,7 @@ target/
 *.iws
 *.iml
 *.ipr
+lib/chromedriver.exe
 
 ### NetBeans ###
 /nbproject/private/

@@ -1,5 +1,5 @@
 crawler:
   driver:
     id: webdriver.chrome.driver
-    path: C:\workspace\aa\crawler\lib\chromedriver.exe
+    path: C:\workspace\aa\storeCrawler\lib\chromedriver.exe
   baseUrl: https://www.naver.com
