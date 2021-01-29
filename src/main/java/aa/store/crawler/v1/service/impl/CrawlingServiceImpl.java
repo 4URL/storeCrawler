@@ -25,7 +25,7 @@ public class CrawlingServiceImpl implements CrawlingService  {
 
     @Override
     public void RunCrawling() {
-        log.info("BaseUrl! : {}", baseUrl);
+        log.info("BaseUrl : {}", baseUrl);
 
         System.setProperty(DRIVER_ID, DRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
