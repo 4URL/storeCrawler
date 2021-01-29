@@ -1,5 +1,6 @@
 package aa.store.crawler.v1.service.impl;
 
+import aa.store.crawler.v1.selenium.util.SeleniumUtil;
 import aa.store.crawler.v1.service.CrawlingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,26 +18,18 @@ public class CrawlingServiceImpl implements CrawlingService  {
     @Value("${crawler.baseUrl}")
     private String baseUrl;
 
-    @Value("${crawler.driver.id}")
-    private String DRIVER_ID;
-
-    @Value("${crawler.driver.path}")
-    private String DRIVER_PATH;
+    private final SeleniumUtil seleniumUtil;
 
     @Override
     public void RunCrawling() {
         log.info("BaseUrl : {}", baseUrl);
 
-        System.setProperty(DRIVER_ID, DRIVER_PATH);
-        ChromeOptions options = new ChromeOptions();
-        options.setCapability("ignoreProtectedModeSettings", true);
-        options.addArguments("--incognito");
-        options.addArguments("--allowed-ips");
-        WebDriver driver = new ChromeDriver(options);
-
+        WebDriver driver = seleniumUtil.getInstance();
+        log.info("driver : {}", driver);
         driver.get(baseUrl);
         System.out.println(driver.getPageSource());
 
+        driver.close();
     }
 
 }
