@@ -23,20 +23,20 @@ public class Database {
     public Map<String, List<Store>> checkDatabase(WebDriver driver, Map<String, List<Store>> database) {
         Map<String, List<Store>> newDatabase = new HashMap<>();
 
-//        log.info("=========== 데이터 검증 전 ===========");
-//        for(Sheets sheet : Sheets.values()) {
-//            log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()).size());
-//            List<Store> stores = database.get(sheet.getSheetName());
-//            List<Store> newStores = new ArrayList<>();
-//            for(Store store : stores) {
-//                driver.get(store.getMapUrl());
-//                if(!mapTypeValidation.isTypeA(driver)
-//                        && !mapTypeValidation.isTypeB(driver)
-//                        && !mapTypeValidation.isTypeC(driver)) continue;
-//                newStores.add(store);
-//            }
-//            newDatabase.put(sheet.getSheetName(), newStores);
-//        }
+        log.info("=========== 데이터 검증 전 ===========");
+        for(Sheets sheet : Sheets.values()) {
+            log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()).size());
+            List<Store> stores = database.get(sheet.getSheetName());
+            List<Store> newStores = new ArrayList<>();
+            for(Store store : stores) {
+                driver.get(store.getMapUrl());
+                if(!mapTypeValidation.isTypeA(driver)
+                        && !mapTypeValidation.isTypeB(driver)
+                        && !mapTypeValidation.isTypeC(driver)) continue;
+                newStores.add(store);
+            }
+            newDatabase.put(sheet.getSheetName(), newStores);
+        }
 
         return newDatabase;
     }
