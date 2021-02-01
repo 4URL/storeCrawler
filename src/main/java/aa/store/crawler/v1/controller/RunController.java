@@ -15,6 +15,10 @@ public class RunController {
     private final CrawlingService crawlingService;
 
     public void run() {
-        crawlingService.RunCrawling();
+        try {
+            crawlingService.RunCrawling();
+        } catch (Exception e) {
+            log.info("{}", e);
+        }
     }
 }

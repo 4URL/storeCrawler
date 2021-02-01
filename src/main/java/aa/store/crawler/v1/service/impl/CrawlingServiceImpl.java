@@ -1,34 +1,67 @@
 package aa.store.crawler.v1.service.impl;
 
-import aa.store.crawler.v1.selenium.util.SeleniumUtil;
+import aa.store.crawler.v1.config.CrawlerConfig;
+import aa.store.crawler.v1.model.store.NewSheets;
+import aa.store.crawler.v1.model.store.Sheets;
+import aa.store.crawler.v1.model.store.Store;
+import aa.store.crawler.v1.util.Excel;
+import aa.store.crawler.v1.util.Logging;
+import aa.store.crawler.v1.util.Search;
+import aa.store.crawler.v1.util.Selenium;
 import aa.store.crawler.v1.service.CrawlingService;
+import aa.store.crawler.v1.validation.Database;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j(topic = "CrawlingService")
 public class CrawlingServiceImpl implements CrawlingService  {
 
-    @Value("${crawler.baseUrl}")
-    private String baseUrl;
+    private final CrawlerConfig config;
 
-    private final SeleniumUtil seleniumUtil;
+    private final Selenium selenium;
+
+    private final Logging logging;
+
+    private final Excel excel;
+
+    private final Search search;
+
+    private final Database databaseValidation;
+
+    private final String BASE_URL = "https://www.naver.com";
 
     @Override
-    public void RunCrawling() {
-        log.info("BaseUrl : {}", baseUrl);
+    public void RunCrawling() throws IOException {
 
-        WebDriver driver = seleniumUtil.getInstance();
-        log.info("driver : {}", driver);
-        driver.get(baseUrl);
-        System.out.println(driver.getPageSource());
+        // 로그 초기화
+        logging.init();
 
+        // Selenium 드라이브 생성
+        WebDriver driver = selenium.getInstance();
+
+        // database.xlsx 읽음
+        Map<String, List<Store>> database = excel.getStoreListFromDatabase();
+
+        // Database 검증
+//        database = databaseValidation.checkDatabase(driver, database);
+        log.info("=========== 데이터 검증 후 ===========");
+        for(Sheets sheet : Sheets.values()) {
+            log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()).size());
+        }
+        log.info("====================================");
+
+        // 새로운 정보 조회
+        search.getNewDatabase(driver, database);
+
+        // Selenium 드라이브 종료
         driver.close();
     }
 
