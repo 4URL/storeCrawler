@@ -32,7 +32,10 @@ public class Database {
                 driver.get(store.getMapUrl());
                 if(!mapTypeValidation.isTypeA(driver)
                         && !mapTypeValidation.isTypeB(driver)
-                        && !mapTypeValidation.isTypeC(driver)) continue;
+                        && !mapTypeValidation.isTypeC(driver)) {
+                    log.info("[업체 제외] {}", store);
+                    continue;
+                }
                 newStores.add(store);
             }
             newDatabase.put(sheet.getSheetName(), newStores);
