@@ -16,7 +16,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class Logging {
+public class LoggingUtil {
 
     private final CrawlerConfig config;
 

@@ -1,15 +1,14 @@
 package aa.store.crawler.v1.service.impl;
 
 import aa.store.crawler.v1.config.CrawlerConfig;
-import aa.store.crawler.v1.model.store.NewSheets;
 import aa.store.crawler.v1.model.store.Sheets;
 import aa.store.crawler.v1.model.store.Store;
-import aa.store.crawler.v1.util.Excel;
-import aa.store.crawler.v1.util.Logging;
-import aa.store.crawler.v1.util.Search;
-import aa.store.crawler.v1.util.Selenium;
+import aa.store.crawler.v1.util.ExcelUtil;
+import aa.store.crawler.v1.util.LoggingUtil;
+import aa.store.crawler.v1.util.SearchUtil;
+import aa.store.crawler.v1.util.SeleniumUtil;
 import aa.store.crawler.v1.service.CrawlingService;
-import aa.store.crawler.v1.validation.Database;
+import aa.store.crawler.v1.validation.DatabaseValidation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
@@ -26,15 +25,15 @@ public class CrawlingServiceImpl implements CrawlingService  {
 
     private final CrawlerConfig config;
 
-    private final Selenium selenium;
+    private final SeleniumUtil seleniumUtil;
 
-    private final Logging logging;
+    private final LoggingUtil loggingUtil;
 
-    private final Excel excel;
+    private final ExcelUtil excelUtil;
 
-    private final Search search;
+    private final SearchUtil searchUtil;
 
-    private final Database databaseValidation;
+    private final DatabaseValidation databaseValidation;
 
     private final String BASE_URL = "https://www.naver.com";
 
@@ -42,13 +41,13 @@ public class CrawlingServiceImpl implements CrawlingService  {
     public void RunCrawling() throws IOException {
 
         // 로그 초기화
-        logging.init();
+        loggingUtil.init();
 
         // Selenium 드라이브 생성
-        WebDriver driver = selenium.getInstance();
+        WebDriver driver = seleniumUtil.getInstance();
 
         // database.xlsx 읽음
-        Map<String, List<Store>> database = excel.getStoreListFromDatabase();
+        Map<String, List<Store>> database = excelUtil.getStoreListFromDatabase();
 
         // Database 검증
 //        database = databaseValidation.checkDatabase(driver, database);
@@ -59,7 +58,9 @@ public class CrawlingServiceImpl implements CrawlingService  {
         log.info("====================================");
 
         // 새로운 정보 조회
-        search.getNewDatabase(driver, database);
+        searchUtil.getNewDatabase(driver, database);
+
+        excelUtil.createResult(database);
 
         // Selenium 드라이브 종료
         driver.close();

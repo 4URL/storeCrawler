@@ -2,10 +2,10 @@ crawler:
   driver:
     id: webdriver.chrome.driver
     path: C:\workspace\aa\storeCrawler\lib\chromedriver.exe
-  ignoreProtectedModeSettings: true
-  useAllowedIps: true
-  useSecretMode: true
-  useHeadlessMode: false
+  ignore-protected-mode-settings: true
+  use-allowed-ips: true
+  use-secret-mode: true
+  use-headless-mode: false
   files:
     database: C:\workspace\aa\storeCrawler\data\database.xlsx
     result: C:\workspace\aa\storeCrawler\data\result.xlsx
@@ -13,6 +13,10 @@ crawler:
   logging:
     mode: NEW
   search:
+    params:
+      start-date: 2018.01.01
+      start-page: 1
+      end-page: 10
     restaurant:
       - 애견 동반 식당
       - 반려 동반 식당
@@ -33,3 +37,50 @@ crawler:
       - 반려 동반 펜션
       - 강아지 함께 펜션
       - 고양이 함께 펜션
+
+---
+spring:
+  profiles: prod
+
+crawler:
+  search:
+    params:
+      start-date: 2018.01.01
+      start-page: 1
+      end-page: 10
+    restaurant:
+      - 애견 동반 식당
+      - 반려 동반 식당
+      - 강아지 함께 식당
+      - 고양이 함께 식당
+    cafe:
+      - 애견 동반 카페
+      - 반려 동반 카페
+      - 강아지 함께 카페
+      - 고양이 함께 카페
+    hotel:
+      - 애견 동반 호텔
+      - 반려 동반 호텔
+      - 강아지 함께 호텔
+      - 고양이 함께 호텔
+    pension:
+      - 애견 동반 펜션
+      - 반려 동반 펜션
+      - 강아지 함께 펜션
+      - 고양이 함께 펜션
+
+---
+spring:
+  profiles: test
+
+crawler:
+  search:
+    params:
+      start-date: 2018.01.01
+      start-page: 1
+      end-page: 1
+    restaurant:
+      - 애견 동반 식당
+    cafe:
+    hotel:
+    pension:

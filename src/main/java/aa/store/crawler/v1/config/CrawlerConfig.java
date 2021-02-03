@@ -43,6 +43,16 @@ public class CrawlerConfig {
     @Getter
     @Setter
     public static class Search {
+
+        @Getter
+        @Setter
+        public static class Params {
+            private String startDate;
+            private long startPage;
+            private long endPage;
+        }
+
+        private Params params = new Params();
         private List<String> restaurant;
         private List<String> cafe;
         private List<String> hotel;
@@ -80,6 +90,9 @@ public class CrawlerConfig {
         builder.append("\t").append("Result File Path").append(" = ").append(files.getResult()).append(System.lineSeparator());
         builder.append("\t").append("Log File Path").append(" = ").append(files.getLog()).append(System.lineSeparator());
         builder.append("\t").append("Logging Mode").append(" = ").append(logging.getMode()).append(System.lineSeparator());
+        builder.append("\t").append("Search Params - Start Date").append(" = ").append(search.getParams().getStartDate()).append(System.lineSeparator());
+        builder.append("\t").append("Search Params - Start Page").append(" = ").append(search.getParams().getStartPage()).append(System.lineSeparator());
+        builder.append("\t").append("Search Params - End Page").append(" = ").append(search.getParams().getEndPage()).append(System.lineSeparator());
         builder.append("\t").append("Search Keywords Restaurant").append(" = ").append(search.getRestaurant()).append(System.lineSeparator());
         builder.append("\t").append("Search Keywords Cafe").append(" = ").append(search.getCafe()).append(System.lineSeparator());
         builder.append("\t").append("Search Keywords Hotel").append(" = ").append(search.getHotel()).append(System.lineSeparator());

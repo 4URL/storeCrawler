@@ -11,13 +11,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class Selenium {
+public class SeleniumUtil {
 
     private final CrawlerConfig config;
 
     public WebDriver getInstance() {
-
-        log.info("Use Allowed IPs : {}, Use Secret Mode : {}", config.isUseAllowedIps(), config.isUseSecretMode());
 
         System.setProperty(config.getDriver().getId(), config.getDriver().getPath());
         ChromeOptions options = new ChromeOptions();

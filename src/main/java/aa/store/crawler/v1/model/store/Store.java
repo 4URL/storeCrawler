@@ -25,6 +25,6 @@ public class Store {
     private String mapUrl;
     private String postTitle;
     private String postUrl;
-    private String count;
+    private int count;
 
 }
