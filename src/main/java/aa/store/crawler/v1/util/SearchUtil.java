@@ -225,7 +225,7 @@ public class SearchUtil {
 
                 MapType mapType = mapTypeValidation.checkMapType(driver);
                 if(mapType == MapType.INVALID) {
-                    loggingUtil.writeFile("[Invalid Map Type] Post URL : " + postUrl);
+                    loggingUtil.writeFile("[Invalid Map Type] Post URL : " + postUrl + ", Map URL : " + driver.getCurrentUrl());
                     continue;
                 }
                 getStoreInfo(driver, database, mapType, newSheet, postUrl, postTitle);
