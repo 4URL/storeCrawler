@@ -3,6 +3,7 @@ package aa.store.crawler.v1.service.impl;
 import aa.store.crawler.v1.config.CrawlerConfig;
 import aa.store.crawler.v1.model.store.Sheets;
 import aa.store.crawler.v1.model.store.Store;
+import aa.store.crawler.v1.model.type.SheetType;
 import aa.store.crawler.v1.util.ExcelUtil;
 import aa.store.crawler.v1.util.LoggingUtil;
 import aa.store.crawler.v1.util.SearchUtil;
@@ -50,9 +51,10 @@ public class CrawlingServiceImpl implements CrawlingService  {
         Map<String, List<Store>> database = excelUtil.getStoreListFromDatabase();
 
         // Database 검증
-//        database = databaseValidation.checkDatabase(driver, database);
+        database = databaseValidation.checkDatabase(driver, database);
         log.info("=========== 데이터 검증 후 ===========");
         for(Sheets sheet : Sheets.values()) {
+            if(sheet.getSheetType() == SheetType.NEW) continue;
             log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()).size());
         }
         log.info("====================================");

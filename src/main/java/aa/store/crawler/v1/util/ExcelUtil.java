@@ -1,7 +1,6 @@
 package aa.store.crawler.v1.util;
 
 import aa.store.crawler.v1.config.CrawlerConfig;
-import aa.store.crawler.v1.model.store.NewSheet;
 import aa.store.crawler.v1.model.store.Sheets;
 import aa.store.crawler.v1.model.store.Store;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -34,10 +31,11 @@ public class ExcelUtil {
         Workbook workbook = WorkbookFactory.create(inputStream);
 
         Map<String, List<Store>> database = new HashMap<>();
-//        for(int i = 0; i < workbook.getNumberOfSheets(); i ++) {
         for(Sheets sheetName : Sheets.values()) {
             List<Store> stores = new ArrayList<Store>();
             Sheet sheet = workbook.getSheet(sheetName.getSheetName());
+            if(sheet == null) continue;
+
             Iterator<Row> rowItr = sheet.iterator();
 
             while (rowItr.hasNext()) {
@@ -51,52 +49,52 @@ public class ExcelUtil {
                     Cell cell = cellItr.next();
                     int index = cell.getColumnIndex();
                     switch (index) {
-                        case 0:
+                        case 1:
                             store.setPlaceName(getValueFromCell(cell));
                             break;
-                        case 1:
+                        case 2:
                             store.setCategory(getValueFromCell(cell));
                             break;
-                        case 2:
+                        case 3:
                             store.setTel(getValueFromCell(cell));
                             break;
-                        case 3:
+                        case 4:
                             store.setBusinessHour(getValueFromCell(cell));
                             break;
-                        case 4:
+                        case 5:
                             store.setHomepage(getValueFromCell(cell));
                             break;
-                        case 5:
+                        case 6:
                             store.setDescription(getValueFromCell(cell));
                             break;
-                        case 6:
+                        case 7:
                             store.setConvenience(getValueFromCell(cell));
                             break;
-                        case 7:
+                        case 8:
                             store.setShortAddress(getValueFromCell(cell));
                             break;
-                        case 8:
+                        case 9:
                             store.setAddress(getValueFromCell(cell));
                             break;
-                        case 9:
+                        case 10:
                             store.setRoadAddress(getValueFromCell(cell));
                             break;
-                        case 10:
+                        case 11:
                             store.setLatitude(getValueFromCell(cell));
                             break;
-                        case 11:
+                        case 12:
                             store.setLongitude(getValueFromCell(cell));
                             break;
-                        case 12:
+                        case 13:
                             store.setMapUrl(getValueFromCell(cell));
                             break;
-                        case 13:
+                        case 14:
                             store.setPostTitle(getValueFromCell(cell));
                             break;
-                        case 14:
+                        case 15:
                             store.setPostUrl(getValueFromCell(cell));
                             break;
-                        case 15:
+                        case 16:
                             store.setCount((int) Math.round(Double.valueOf(getValueFromCell(cell))));
                             break;
                     }
@@ -135,14 +133,9 @@ public class ExcelUtil {
         XSSFWorkbook xssfWb = new XSSFWorkbook(); // .xlsx
         try {
             for(Sheets sheet : Sheets.values()) {
-                // 없는 시트인 경우 Continue
+                // 없는 데이터인 경우 Continue
                 if(database.get(sheet.getSheetName()) == null) continue;
-                makeSheet(xssfWb, database, sheet.getSheetName());
-            }
-            for(NewSheet sheet : NewSheet.values()) {
-                // 없는 시트인 경우 Continue
-                if(database.get(sheet.getSheetName()) == null) continue;
-                makeSheet(xssfWb, database, sheet.getSheetName());
+                makeSheet(xssfWb, database, sheet);
             }
             String localFile = makeExcelFileName(config.getFiles().getResult());
             File file = new File(localFile);
@@ -159,7 +152,7 @@ public class ExcelUtil {
         }
     }
 
-    private void makeSheet(XSSFWorkbook xssfWb, Map<String, List<Store>> database, String sheetName) {
+    private void makeSheet(XSSFWorkbook xssfWb, Map<String, List<Store>> database, Sheets sheet) {
         //헤더용 폰트 스타일
         XSSFFont font = xssfWb.createFont();
         font.setFontName(HSSFFont.FONT_ARIAL); //폰트스타일
@@ -180,7 +173,7 @@ public class ExcelUtil {
 
         int rowNo = 0; // 행 갯수
         // 워크북 생성
-        xssfSheet = xssfWb.createSheet(sheetName); // 워크시트 이름
+        xssfSheet = xssfWb.createSheet(sheet.getSheetName()); // 워크시트 이름
 
         xssfSheet.setColumnWidth(0, (xssfSheet.getColumnWidth(3)) + 2048); // 3번째 컬럼 넓이 조절
         xssfSheet.setColumnWidth(1, (xssfSheet.getColumnWidth(3)) + 2048); // 3번째 컬럼 넓이 조절
@@ -198,108 +191,115 @@ public class ExcelUtil {
         xssfSheet.setColumnWidth(13, (xssfSheet.getColumnWidth(3)) + 2048); // 3번째 컬럼 넓이 조절
         xssfSheet.setColumnWidth(14, (xssfSheet.getColumnWidth(3)) + 2048); // 3번째 컬럼 넓이 조절
         xssfSheet.setColumnWidth(15, (xssfSheet.getColumnWidth(4)) + 2048); // 4번째 컬럼 넓이 조절
+        xssfSheet.setColumnWidth(16, (xssfSheet.getColumnWidth(4)) + 2048); // 4번째 컬럼 넓이 조절
 
         //타이틀 생성
         xssfRow = xssfSheet.createRow(rowNo++); //행 객체 추가
         xssfCell = xssfRow.createCell(0);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("업체명");
+        xssfCell.setCellValue("메인카테고리");
         xssfCell = xssfRow.createCell(1);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("카테고리");
+        xssfCell.setCellValue("업체명");
         xssfCell = xssfRow.createCell(2);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("전화번호");
+        xssfCell.setCellValue("카테고리");
         xssfCell = xssfRow.createCell(3);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("영업시간");
+        xssfCell.setCellValue("전화번호");
         xssfCell = xssfRow.createCell(4);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("홈페이지");
+        xssfCell.setCellValue("영업시간");
         xssfCell = xssfRow.createCell(5);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("설명");
+        xssfCell.setCellValue("홈페이지");
         xssfCell = xssfRow.createCell(6);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("편의시설");
+        xssfCell.setCellValue("설명");
         xssfCell = xssfRow.createCell(7);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("짧은 주소");
+        xssfCell.setCellValue("편의시설");
         xssfCell = xssfRow.createCell(8);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("주소");
+        xssfCell.setCellValue("짧은 주소");
         xssfCell = xssfRow.createCell(9);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("도로명 주소");
+        xssfCell.setCellValue("주소");
         xssfCell = xssfRow.createCell(10);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("위도");
+        xssfCell.setCellValue("도로명 주소");
         xssfCell = xssfRow.createCell(11);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("경도");
+        xssfCell.setCellValue("위도");
         xssfCell = xssfRow.createCell(12);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("지도 URL");
+        xssfCell.setCellValue("경도");
         xssfCell = xssfRow.createCell(13);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("포스트 제목");
+        xssfCell.setCellValue("지도 URL");
         xssfCell = xssfRow.createCell(14);
         xssfCell.setCellStyle(cellStyleTitle);
-        xssfCell.setCellValue("포스트 URL");
+        xssfCell.setCellValue("포스트 제목");
         xssfCell = xssfRow.createCell(15);
+        xssfCell.setCellStyle(cellStyleTitle);
+        xssfCell.setCellValue("포스트 URL");
+        xssfCell = xssfRow.createCell(16);
         xssfCell.setCellStyle(cellStyleTitle);
         xssfCell.setCellValue("포스트 개수");
 
-        for (Store store : database.get(sheetName)) {
+        for (Store store : database.get(sheet.getSheetName())) {
 
             //헤더 생성
             xssfRow = xssfSheet.createRow(rowNo++); //헤더 01
             xssfCell = xssfRow.createCell(0);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getPlaceName());
+            xssfCell.setCellValue(sheet.getCategory());
             xssfCell = xssfRow.createCell(1);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getCategory());
+            xssfCell.setCellValue(store.getPlaceName());
             xssfCell = xssfRow.createCell(2);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getTel());
+            xssfCell.setCellValue(store.getCategory());
             xssfCell = xssfRow.createCell(3);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getBusinessHour());
+            xssfCell.setCellValue(store.getTel());
             xssfCell = xssfRow.createCell(4);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getHomepage());
+            xssfCell.setCellValue(store.getBusinessHour());
             xssfCell = xssfRow.createCell(5);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getDescription());
+            xssfCell.setCellValue(store.getHomepage());
             xssfCell = xssfRow.createCell(6);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getConvenience());
+            xssfCell.setCellValue(store.getDescription());
             xssfCell = xssfRow.createCell(7);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getShortAddress());
+            xssfCell.setCellValue(store.getConvenience());
             xssfCell = xssfRow.createCell(8);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getAddress());
+            xssfCell.setCellValue(store.getShortAddress());
             xssfCell = xssfRow.createCell(9);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getRoadAddress());
+            xssfCell.setCellValue(store.getAddress());
             xssfCell = xssfRow.createCell(10);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getLatitude());
+            xssfCell.setCellValue(store.getRoadAddress());
             xssfCell = xssfRow.createCell(11);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getLongitude());
+            xssfCell.setCellValue(store.getLatitude());
             xssfCell = xssfRow.createCell(12);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getMapUrl());
+            xssfCell.setCellValue(store.getLongitude());
             xssfCell = xssfRow.createCell(13);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getPostTitle());
+            xssfCell.setCellValue(store.getMapUrl());
             xssfCell = xssfRow.createCell(14);
             xssfCell.setCellStyle(cellStyleBody);
-            xssfCell.setCellValue(store.getPostUrl());
+            xssfCell.setCellValue(store.getPostTitle());
             xssfCell = xssfRow.createCell(15);
+            xssfCell.setCellStyle(cellStyleBody);
+            xssfCell.setCellValue(store.getPostUrl());
+            xssfCell = xssfRow.createCell(16);
             xssfCell.setCellStyle(cellStyleBody);
             xssfCell.setCellValue(store.getCount());
         }

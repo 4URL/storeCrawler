@@ -3,16 +3,15 @@ package aa.store.crawler.v1.util;
 import aa.store.crawler.v1.config.CrawlerConfig;
 import aa.store.crawler.v1.model.naver.Detail;
 import aa.store.crawler.v1.model.naver.StoreInfo;
-import aa.store.crawler.v1.model.store.NewSheet;
+import aa.store.crawler.v1.model.store.Sheets;
 import aa.store.crawler.v1.model.store.Store;
 import aa.store.crawler.v1.model.type.MapType;
+import aa.store.crawler.v1.model.type.SheetType;
 import aa.store.crawler.v1.validation.MapTypeValidation;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.util.StringUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,13 +34,15 @@ public class SearchUtil {
 
     public void getNewDatabase(WebDriver driver, Map<String, List<Store>> database) {
 
-        for(NewSheet sheet : NewSheet.values()) {
+        for(Sheets sheet : Sheets.values()) {
+            if(sheet.getSheetType() == SheetType.ORIGINAL) continue;
+
             List<String> searchKeywords;
             switch (sheet) {
-                case RESTAURANT -> searchKeywords = config.getSearch().getRestaurant();
-                case CAFE -> searchKeywords = config.getSearch().getCafe();
-                case HOTEL -> searchKeywords = config.getSearch().getHotel();
-                case PENSION -> searchKeywords = config.getSearch().getPension();
+                case RESTAURANT_NEW -> searchKeywords = config.getSearch().getRestaurant();
+                case CAFE_NEW -> searchKeywords = config.getSearch().getCafe();
+                case HOTEL_AND_RESORT_NEW -> searchKeywords = config.getSearch().getHotel();
+                case PENSION_NEW -> searchKeywords = config.getSearch().getPension();
                 default -> searchKeywords = new ArrayList<>();
             }
 
@@ -64,7 +65,7 @@ public class SearchUtil {
         element.submit();
     }
 
-    private void collectData(WebDriver driver, Map<String, List<Store>> database, NewSheet newSheet) {
+    private void collectData(WebDriver driver, Map<String, List<Store>> database, Sheets sheet) {
         List<WebElement> elements = driver.findElements(By.cssSelector("a.tab"));
         for(WebElement element : elements) {
             if(element.getText().contains("VIEW")) {
@@ -122,7 +123,7 @@ public class SearchUtil {
 
         for(String link : links) {
             driver.get(link);
-            searchMapLink(driver, database, newSheet);
+            searchMapLink(driver, database, sheet);
         }
     }
 
@@ -189,7 +190,7 @@ public class SearchUtil {
         }
     }
 
-    private void searchMapLink(WebDriver driver, Map<String, List<Store>> database, NewSheet newSheet) {
+    private void searchMapLink(WebDriver driver, Map<String, List<Store>> database, Sheets sheet) {
         List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
         for(WebElement iframe : iframes) {
             try {
@@ -206,10 +207,10 @@ public class SearchUtil {
                 continue;
             }
         }
-        getMapInfo(driver, database, newSheet);
+        getMapInfo(driver, database, sheet);
     }
 
-    private void getMapInfo(WebDriver driver, Map<String, List<Store>> database, NewSheet newSheet) {
+    private void getMapInfo(WebDriver driver, Map<String, List<Store>> database, Sheets sheet) {
         String postUrl = driver.getCurrentUrl();
         String postTitle = driver.getTitle();
         log.info("Post Title : {}, Post Url : {}", postTitle, postUrl);
@@ -228,7 +229,7 @@ public class SearchUtil {
                     loggingUtil.writeFile("[Invalid Map Type] Post URL : " + postUrl + ", Map URL : " + driver.getCurrentUrl());
                     continue;
                 }
-                getStoreInfo(driver, database, mapType, newSheet, postUrl, postTitle);
+                getStoreInfo(driver, database, mapType, sheet, postUrl, postTitle);
                 driver.close();
             }
         }
@@ -236,7 +237,7 @@ public class SearchUtil {
         driver.switchTo().window(parent);
     }
 
-    private void getStoreInfo(WebDriver driver, Map<String, List<Store>> database, MapType mapType, NewSheet newSheet, String postUrl, String postTitle) {
+    private void getStoreInfo(WebDriver driver, Map<String, List<Store>> database, MapType mapType, Sheets sheet, String postUrl, String postTitle) {
         Store store = new Store();
         store.setMapUrl(driver.getCurrentUrl());
         store.setCount(1);
@@ -301,9 +302,9 @@ public class SearchUtil {
             return;
         }
 
-        boolean updateYn = checkExistStore(database, newSheet.getOriginalSheetName(), store);
+        boolean updateYn = checkExistStore(database, sheet.getSheetName(), store);
         if(!updateYn) {
-            insertStore(database, newSheet.getSheetName(), store);
+            insertStore(database, sheet.getSheetName(), store);
         }
     }
 

@@ -2,6 +2,7 @@ package aa.store.crawler.v1.validation;
 
 import aa.store.crawler.v1.model.store.Sheets;
 import aa.store.crawler.v1.model.store.Store;
+import aa.store.crawler.v1.model.type.SheetType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
@@ -24,6 +25,7 @@ public class DatabaseValidation {
 
         log.info("=========== 데이터 검증 전 ===========");
         for(Sheets sheet : Sheets.values()) {
+            if(sheet.getSheetType() == SheetType.NEW) continue;
             log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()).size());
             List<Store> stores = database.get(sheet.getSheetName());
             List<Store> newStores = new ArrayList<>();
