@@ -55,7 +55,7 @@ public class CrawlingServiceImpl implements CrawlingService  {
         log.info("=========== 데이터 검증 후 ===========");
         for(Sheets sheet : Sheets.values()) {
             if(sheet.getSheetType() == SheetType.NEW) continue;
-            log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()).size());
+            log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()) != null ? database.get(sheet.getSheetName()).size() : 0);
         }
         log.info("====================================");
 

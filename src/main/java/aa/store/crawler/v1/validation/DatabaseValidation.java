@@ -26,8 +26,9 @@ public class DatabaseValidation {
         log.info("=========== 데이터 검증 전 ===========");
         for(Sheets sheet : Sheets.values()) {
             if(sheet.getSheetType() == SheetType.NEW) continue;
-            log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()).size());
+            log.info("[{}] 업체 수 : {}", sheet.getSheetName(), database.get(sheet.getSheetName()) != null ? database.get(sheet.getSheetName()).size() : 0);
             List<Store> stores = database.get(sheet.getSheetName());
+            if(stores == null) continue;
             List<Store> newStores = new ArrayList<>();
             for(Store store : stores) {
                 driver.get(store.getMapUrl());

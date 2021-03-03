@@ -23,14 +23,19 @@ public class ExcelUtil {
     private final CrawlerConfig config;
 
     public Map<String, List<Store>> getStoreListFromDatabase() throws IOException {
+        // result
+        Map<String, List<Store>> database = new HashMap<>();
 
         String filePath = config.getFiles().getDatabase();
+        if(!new File(filePath).exists()) {
+            log.info("Database File Not Found");
+            return database;
+        }
 
         InputStream inputStream = new FileInputStream(filePath);
-
         Workbook workbook = WorkbookFactory.create(inputStream);
 
-        Map<String, List<Store>> database = new HashMap<>();
+
         for(Sheets sheetName : Sheets.values()) {
             List<Store> stores = new ArrayList<Store>();
             Sheet sheet = workbook.getSheet(sheetName.getSheetName());
