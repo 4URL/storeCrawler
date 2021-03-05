@@ -66,6 +66,14 @@ public class CrawlingServiceImpl implements CrawlingService  {
 
         // Selenium 드라이브 종료
         driver.close();
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            driver.quit();
+        }
     }
 
 }
